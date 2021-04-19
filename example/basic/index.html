@@ -1,48 +1,88 @@
 <head>
-  <script src="//unpkg.com/sunburst-chart"></script>
-  <!--<script src="../../dist/sunburst-chart.js"></script>-->
+    <!-- <script src="//unpkg.com/sunburst-chart"></script> -->
+    <script src="../../dist/sunburst-chart.js"></script>
 
-  <style>body { margin: 0 }</style>
+    <style>
+        body {
+            margin: 0;
+        }
+        
+        .chart {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+        }
+    </style>
 </head>
+
 <body>
-  <div id="chart"></div>
+    <div id="chart" class="chart"></div>
 
-  <script>
-    const data = {
-      name: 'main',
-      color: 'magenta',
-      children: [{
-        name: 'a',
-        color: 'yellow',
-        size: 1
-      },{
-        name: 'b',
-        color: 'red',
-        children: [{
-          name: 'ba',
-          color: 'orange',
-          size: 1
-        }, {
-          name: 'bb',
-          color: 'blue',
-          children: [{
-            name: 'bba',
-            color: 'green',
-            size: 1
-          }, {
-            name: 'bbb',
-            color: 'pink',
-            size: 1
-          }]
-        }]
-      }]
-    };
+    <script>
+        const data = {
+            name: "main",
+            color: "magenta",
+            changes: {
+                splitted: 10,
+                moved: 30,
+                renamed: 5,
+                merged: 12,
+            },
+            children: [{
+                name: "a",
+                color: "yellow",
+                size: 1,
+                changes: {
+                    splitted: 4,
+                    moved: 4,
+                    renamed: 5,
+                    merged: 2,
+                },
+            }, {
+                name: "b",
+                color: "red",
+                changes: {
+                    added: 40,
+                    merged: 25,
+                    removed: 150,
+                },
+                children: [{
+                    name: "ba",
+                    color: "orange",
+                    size: 1,
+                    changes: {
+                        splitted: 5,
+                        moved: 11,
+                    },
+                }, {
+                    name: "bb",
+                    color: "blue",
+                    changes: {
+                        added: 40,
+                        removed: 10,
+                    },
+                    children: [{
+                        name: "bba",
+                        color: "green",
+                        size: 1,
+                        changes: {
+                            added: 40,
+                        },
+                    }, {
+                        name: "bbb",
+                        color: "pink",
+                        size: 1,
+                        changes: {
+                            splitted: 6,
+                            moved: 6,
+                        },
+                    }, ],
+                }, ],
+            }, ],
+        };
 
-    Sunburst()
-      .data(data)
-      .size('size')
-      .color('color')
-      .radiusScaleExponent(1)
-      (document.getElementById('chart'));
-  </script>
+        Sunburst().data(data).size("size").color("color").radiusScaleExponent(1)(
+            document.getElementById("chart")
+        );
+    </script>
 </body>
