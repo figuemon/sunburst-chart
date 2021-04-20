@@ -176,7 +176,7 @@ export default Kapsule({
         state.svg
             .style('width', adjustHeight + 'px')
             .style('height', adjustWidth + 'px')
-            .attr('viewBox', `${-adjustWidth/2} ${-adjustHeight/2} ${state.width} ${state.height}`);
+            .attr('viewBox', `${-adjustWidth/2} ${-adjustHeight/2} ${adjustWidth} ${adjustHeight}`);
 
         //  .startAngle(d => state.angleScale(d.x0))
         // .endAngle(d => state.angleScale(d.x1))
