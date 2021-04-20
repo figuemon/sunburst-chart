@@ -275,7 +275,7 @@ var sunburst = Kapsule__default['default']({
     state.radiusScaleExponent > 0 && state.radiusScale.exponent(state.radiusScaleExponent);
     var adjustHeight = state.height + 300;
     var adjustWidth = state.height + 300;
-    state.svg.style('width', adjustHeight + 'px').style('height', adjustWidth + 'px').attr('viewBox', "".concat(-state.width / 2, " ").concat(-state.height / 2, " ").concat(state.width, " ").concat(state.height)); //  .startAngle(d => state.angleScale(d.x0))
+    state.svg.style('width', adjustHeight + 'px').style('height', adjustWidth + 'px').attr('viewBox', "".concat(-adjustWidth / 2, " ").concat(-adjustHeight / 2, " ").concat(state.width, " ").concat(state.height)); //  .startAngle(d => state.angleScale(d.x0))
     // .endAngle(d => state.angleScale(d.x1))
     // .innerRadius(d => Math.max(0, state.radiusScale(d.y0)))
     // .outerRadius(d => Math.max(0, state.radiusScale(d.y1)));
@@ -328,18 +328,34 @@ var sunburst = Kapsule__default['default']({
         keys.forEach(function (element) {
           var percentage = d.data.changes[element] / maxScope;
           var distance = 2.5 * percentage;
-          var displayP = Number(percentage * 100).toFixed(2);
-          panel.append('path').attr('d', state.outerArc({
+          var displayP = Number(percentage * 100).toFixed(1);
+          var arc = {
             x0: base,
             x1: base + distance,
             y0: 1.1,
             y1: 1.3
-          })).attr('id', element + d.data.name).attr('fill', state.outerColors(element)).style('display', 'block');
-          panel.append('text').attr("x", 30) //Move the text from the start angle of the arc
-          .attr("dy", 18) //Move the text down
-          .append("textPath").attr("xlink:href", '#' + element + d.data.name).text(function (d) {
-            return displayP + "%";
-          });
+          };
+          panel.append('path').attr('d', state.outerArc(arc)).attr('id', element + d.data.name).attr('fill', state.outerColors(element)).style('display', 'block');
+
+          if (percentage > 0.04) {
+            panel.append('text').attr("class", "text-contour").attr("transform", function (d) {
+              return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
+            }) // <-- 3
+            .attr("dx", "-1") // <-- 4
+            .attr("dy", ".5em") // <-- 5
+            .text(function (d) {
+              return displayP + "%";
+            });
+            panel.append('text').attr("class", "text-stroke").attr("transform", function (d) {
+              return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
+            }) // <-- 3
+            .attr("dx", "-1") // <-- 4
+            .attr("dy", ".5em") // <-- 5
+            .text(function (d) {
+              return displayP + "%";
+            });
+          }
+
           base = base + distance;
         });
       }
@@ -476,6 +492,15 @@ var sunburst = Kapsule__default['default']({
         return radialTextTransform(d);
       };
     }); //
+
+    function computeTextRotation(d) {
+      var angle = (state.originalAngleScale(d.x0) + state.originalAngleScale(d.x1)) / Math.PI * 90; // <-- 1
+      // Avoid upside-down labels
+
+      return angle < 90 || angle > 270 ? angle : angle + 180; // <--2 "labels aligned with slices"
+      // Alternate label formatting
+      //return (angle < 180) ? angle - 90 : angle + 90;  // <-- 3 "labels as spokes"
+    }
 
     function middleArcLine(d) {
       var halfPi = Math.PI / 2;

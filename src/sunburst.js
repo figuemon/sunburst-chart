@@ -176,7 +176,7 @@ export default Kapsule({
         state.svg
             .style('width', adjustHeight + 'px')
             .style('height', adjustWidth + 'px')
-            .attr('viewBox', `${-state.width/2} ${-state.height/2} ${state.width} ${state.height}`);
+            .attr('viewBox', `${-adjustWidth/2} ${-adjustHeight/2} ${state.width} ${state.height}`);
 
         //  .startAngle(d => state.angleScale(d.x0))
         // .endAngle(d => state.angleScale(d.x1))
@@ -229,19 +229,33 @@ export default Kapsule({
                 keys.forEach(element => {
                     const percentage = d.data.changes[element] / maxScope;
                     const distance = 2.5 * percentage;
-                    const displayP = Number(percentage * 100).toFixed(2);
+                    const displayP = Number(percentage * 100).toFixed(1);
+                    const arc = { x0: base, x1: base + distance, y0: 1.1, y1: 1.3 };
                     panel.append('path')
-                        .attr('d', state.outerArc({ x0: base, x1: base + distance, y0: 1.1, y1: 1.3 }))
+                        .attr('d', state.outerArc(arc))
                         .attr('id', element + d.data.name)
                         .attr('fill', state.outerColors(element))
                         .style('display', 'block');
-                    panel.append('text')
-                        .attr("x", 30) //Move the text from the start angle of the arc
-                        .attr("dy", 18) //Move the text down
-                        .append("textPath")
-                        .attr("xlink:href", '#' + element + d.data.name)
-                        .text(function(d) { return displayP + "%"; });
+                    if (percentage > 0.04) {
+                        panel.append('text')
+                            .attr("class", "text-contour")
+                            .attr("transform", function(d) {
+                                return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
+                            }) // <-- 3
+                            .attr("dx", "-1") // <-- 4
+                            .attr("dy", ".5em") // <-- 5
+                            .text(function(d) { return displayP + "%"; });
+                        panel.append('text')
+                            .attr("class", "text-stroke")
+                            .attr("transform", function(d) {
+                                return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
+                            }) // <-- 3
+                            .attr("dx", "-1") // <-- 4
+                            .attr("dy", ".5em") // <-- 5
+                            .text(function(d) { return displayP + "%"; });
+                    }
                     base = base + distance;
+
                 });
             }
         }
@@ -394,6 +408,23 @@ export default Kapsule({
             .attrTween('transform', d => () => radialTextTransform(d));
 
         //
+        function computeTextRotation(d) {
+            var angle = (state.originalAngleScale(d.x0) + state.originalAngleScale(d.x1)) / Math.PI * 90; // <-- 1
+
+            // Avoid upside-down labels
+            return (angle < 90 || angle > 270) ? angle : angle + 180; // <--2 "labels aligned with slices"
+
+            // Alternate label formatting
+            //return (angle < 180) ? angle - 90 : angle + 90;  // <-- 3 "labels as spokes"
+        }
+
+        function labelTransform(d) {
+            const sumAngles = state.originalAngleScale(d.x0) + state.originalAngleScale(d.x1);
+            const sumRadius = Math.max(0, state.radiusScale(d.y0)) + Math.max(0, state.radiusScale(d.y1));
+            const x = sumAngles / 2 * 180 / Math.PI;
+            const y = sumRadius / 2 * radius;
+            return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
+        }
 
         function middleArcLine(d) {
             const halfPi = Math.PI / 2;
