@@ -263,12 +263,12 @@ var sunburst = Kapsule({
       state.needsReparse = false;
     }
 
-    var maxRadius = Math.min(state.width, state.height) / 2;
+    var maxRadius = Math.min(state.width - 100, state.height - 100) / 2;
     state.radiusScale.range([maxRadius * Math.max(0, Math.min(1, state.centerRadius)), maxRadius]);
     state.radiusScaleExponent > 0 && state.radiusScale.exponent(state.radiusScaleExponent);
-    var adjustHeight = state.height + 300;
-    var adjustWidth = state.height + 300;
-    state.svg.style('width', adjustHeight + 'px').style('height', adjustWidth + 'px').attr('viewBox', "".concat(-adjustWidth / 2, " ").concat(-adjustHeight / 2, " ").concat(adjustWidth, " ").concat(adjustHeight)); //  .startAngle(d => state.angleScale(d.x0))
+    var adjustHeight = state.height + 100;
+    var adjustWidth = state.height + 100;
+    state.svg.style('width', adjustWidth + 'px').style('height', adjustHeight + 'px').attr('viewBox', "".concat(-adjustWidth / 2, " ").concat(-adjustHeight / 2, " ").concat(adjustWidth, " ").concat(adjustHeight)); //  .startAngle(d => state.angleScale(d.x0))
     // .endAngle(d => state.angleScale(d.x1))
     // .innerRadius(d => Math.max(0, state.radiusScale(d.y0)))
     // .outerRadius(d => Math.max(0, state.radiusScale(d.y1)));

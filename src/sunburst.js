@@ -166,16 +166,16 @@ export default Kapsule({
             state.needsReparse = false;
         }
 
-        const maxRadius = (Math.min(state.width, state.height) / 2);
+        const maxRadius = (Math.min(state.width - 100, state.height - 100) / 2);
         state.radiusScale.range([maxRadius * Math.max(0, Math.min(1, state.centerRadius)), maxRadius]);
 
         state.radiusScaleExponent > 0 && state.radiusScale.exponent(state.radiusScaleExponent);
 
-        const adjustHeight = state.height + 300;
-        const adjustWidth = state.height + 300;
+        const adjustHeight = state.height + 100;
+        const adjustWidth = state.height + 100;
         state.svg
-            .style('width', adjustHeight + 'px')
-            .style('height', adjustWidth + 'px')
+            .style('width', adjustWidth + 'px')
+            .style('height', adjustHeight + 'px')
             .attr('viewBox', `${-adjustWidth/2} ${-adjustHeight/2} ${adjustWidth} ${adjustHeight}`);
 
         //  .startAngle(d => state.angleScale(d.x0))
