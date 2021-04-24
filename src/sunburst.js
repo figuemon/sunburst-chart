@@ -200,6 +200,10 @@ export default Kapsule({
             bottomRight.style('display', 'none');
             topLeft.style('display', 'none');
             bottomLeft.style('display', 'none');
+            topRight.html('');
+            bottomRight.html('');
+            topLeft.html('');
+            bottomLeft.html('');
             if (d.data.changes) {
                 const maxScope = Object.values(d.data.changes).reduce((a, b) => a + b);
                 const keys = Object.keys(d.data.changes);

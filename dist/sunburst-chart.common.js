@@ -291,6 +291,10 @@ var sunburst = Kapsule__default['default']({
       bottomRight.style('display', 'none');
       topLeft.style('display', 'none');
       bottomLeft.style('display', 'none');
+      topRight.html('');
+      bottomRight.html('');
+      topLeft.html('');
+      bottomLeft.html('');
 
       if (d.data.changes) {
         var maxScope = Object.values(d.data.changes).reduce(function (a, b) {
