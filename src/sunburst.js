@@ -210,27 +210,30 @@ export default Kapsule({
                 });
                 var keys = Object.keys(d.data.changes);
                 var middle = (d.x0 + d.x1) / 2;
+                var baseValue = state.angleScale.domain()[0];
+                var maxValue = state.angleScale.domain()[1];
+                var segmentSize = (maxValue - baseValue) / 4;
                 var base = 0;
                 var panel;
 
-                if (middle <= 0.25) {
+                if (middle <= baseValue + segmentSize) {
                     state.topRight.style('display', 'block');
                     panel = state.topRight;
                 }
 
-                if (middle > 0.25 && middle <= 0.5) {
+                if (middle > baseValue + segmentSize && middle <= baseValue + (segmentSize * 2)) {
                     base = 2.5;
                     state.bottomRight.style('display', 'block');
                     panel = state.bottomRight;
                 }
 
-                if (middle > 0.5 && middle <= 0.75) {
+                if (middle > baseValue + (segmentSize * 2) && middle <= baseValue + (segmentSize * 3)) {
                     base = 5;
                     state.bottomLeft.style('display', 'block');
                     panel = state.bottomLeft;
                 }
 
-                if (middle > 0.75) {
+                if (middle > baseValue + (segmentSize * 3)) {
                     base = 7.5;
                     state.topLeft.style('display', 'block');
                     panel = state.topLeft;
