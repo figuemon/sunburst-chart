@@ -280,21 +280,28 @@ var sunburst = Kapsule__default['default']({
     // .innerRadius(d => Math.max(0, state.radiusScale(d.y0)))
     // .outerRadius(d => Math.max(0, state.radiusScale(d.y1)));
 
-    state.outerRing = state.svg.append('g');
-    var topRight = state.outerRing.append('g').style('display', 'none');
-    var bottomRight = state.outerRing.append('g').style('display', 'none');
-    var bottomLeft = state.outerRing.append('g').style('display', 'none');
-    var topLeft = state.outerRing.append('g').style('display', 'none');
+    if (!state.outerRing) {
+      state.outerRing = state.svg.append('g');
+      state.topRight = state.outerRing.append('g').style('display', 'none');
+      state.bottomRight = state.outerRing.append('g').style('display', 'none');
+      state.bottomLeft = state.outerRing.append('g').style('display', 'none');
+      state.topLeft = state.outerRing.append('g').style('display', 'none');
+    }
+    /**
+     * Populate the satellite ring
+     * @param {*} d 
+     */
+
 
     function populateOuterRing(d) {
-      topRight.style('display', 'none');
-      bottomRight.style('display', 'none');
-      topLeft.style('display', 'none');
-      bottomLeft.style('display', 'none');
-      topRight.html('');
-      bottomRight.html('');
-      topLeft.html('');
-      bottomLeft.html('');
+      state.topRight.style('display', 'none');
+      state.bottomRight.style('display', 'none');
+      state.topLeft.style('display', 'none');
+      state.bottomLeft.style('display', 'none');
+      state.topRight.html('');
+      state.bottomRight.html('');
+      state.topLeft.html('');
+      state.bottomLeft.html('');
 
       if (d.data.changes) {
         var maxScope = Object.values(d.data.changes).reduce(function (a, b) {
@@ -306,26 +313,26 @@ var sunburst = Kapsule__default['default']({
         var panel;
 
         if (middle <= 0.25) {
-          topRight.style('display', 'block');
-          panel = topRight;
+          state.topRight.style('display', 'block');
+          panel = state.topRight;
         }
 
         if (middle > 0.25 && middle <= 0.5) {
           base = 2.5;
-          bottomRight.style('display', 'block');
-          panel = bottomRight;
+          state.bottomRight.style('display', 'block');
+          panel = state.bottomRight;
         }
 
         if (middle > 0.5 && middle <= 0.75) {
           base = 5;
-          bottomLeft.style('display', 'block');
-          panel = bottomLeft;
+          state.bottomLeft.style('display', 'block');
+          panel = state.bottomLeft;
         }
 
         if (middle > 0.75) {
           base = 7.5;
-          topLeft.style('display', 'block');
-          panel = topLeft;
+          state.topLeft.style('display', 'block');
+          panel = state.topLeft;
         }
 
         panel.html("");

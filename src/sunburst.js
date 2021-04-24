@@ -182,84 +182,93 @@ export default Kapsule({
         // .endAngle(d => state.angleScale(d.x1))
         // .innerRadius(d => Math.max(0, state.radiusScale(d.y0)))
         // .outerRadius(d => Math.max(0, state.radiusScale(d.y1)));
-        state.outerRing = state.svg.append('g');
-        const topRight = state.outerRing.append('g')
-            .style('display', 'none');
-        const bottomRight = state.outerRing.append('g')
-            .style('display', 'none');
-        const bottomLeft = state.outerRing.append('g')
-            .style('display', 'none');
-        const topLeft = state.outerRing.append('g')
-            .style('display', 'none');
+        if (!state.outerRing) {
+            state.outerRing = state.svg.append('g');
+            state.topRight = state.outerRing.append('g').style('display', 'none');
+            state.bottomRight = state.outerRing.append('g').style('display', 'none');
+            state.bottomLeft = state.outerRing.append('g').style('display', 'none');
+            state.topLeft = state.outerRing.append('g').style('display', 'none');
+        }
 
-
-
-
+        /**
+         * Populate the satellite ring
+         * @param {*} d 
+         */
         function populateOuterRing(d) {
-            topRight.style('display', 'none');
-            bottomRight.style('display', 'none');
-            topLeft.style('display', 'none');
-            bottomLeft.style('display', 'none');
-            topRight.html('');
-            bottomRight.html('');
-            topLeft.html('');
-            bottomLeft.html('');
+            state.topRight.style('display', 'none');
+            state.bottomRight.style('display', 'none');
+            state.topLeft.style('display', 'none');
+            state.bottomLeft.style('display', 'none');
+            state.topRight.html('');
+            state.bottomRight.html('');
+            state.topLeft.html('');
+            state.bottomLeft.html('');
+
             if (d.data.changes) {
-                const maxScope = Object.values(d.data.changes).reduce((a, b) => a + b);
-                const keys = Object.keys(d.data.changes);
-                const middle = (d.x0 + d.x1) / 2;
-                let base = 0;
-                let panel;
+                var maxScope = Object.values(d.data.changes).reduce(function(a, b) {
+                    return a + b;
+                });
+                var keys = Object.keys(d.data.changes);
+                var middle = (d.x0 + d.x1) / 2;
+                var base = 0;
+                var panel;
+
                 if (middle <= 0.25) {
-                    topRight.style('display', 'block');
-                    panel = topRight;
+                    state.topRight.style('display', 'block');
+                    panel = state.topRight;
                 }
+
                 if (middle > 0.25 && middle <= 0.5) {
                     base = 2.5;
-                    bottomRight.style('display', 'block');
-                    panel = bottomRight;
+                    state.bottomRight.style('display', 'block');
+                    panel = state.bottomRight;
                 }
+
                 if (middle > 0.5 && middle <= 0.75) {
                     base = 5;
-                    bottomLeft.style('display', 'block');
-                    panel = bottomLeft;
+                    state.bottomLeft.style('display', 'block');
+                    panel = state.bottomLeft;
                 }
+
                 if (middle > 0.75) {
                     base = 7.5;
-                    topLeft.style('display', 'block');
-                    panel = topLeft;
+                    state.topLeft.style('display', 'block');
+                    panel = state.topLeft;
                 }
-                panel.html("");
-                keys.forEach(element => {
-                    const percentage = d.data.changes[element] / maxScope;
-                    const distance = 2.5 * percentage;
-                    const displayP = Number(percentage * 100).toFixed(1);
-                    const arc = { x0: base, x1: base + distance, y0: 1.1, y1: 1.3 };
-                    panel.append('path')
-                        .attr('d', state.outerArc(arc))
-                        .attr('id', element + d.data.name)
-                        .attr('fill', state.outerColors(element))
-                        .style('display', 'block');
-                    if (percentage > 0.04) {
-                        panel.append('text')
-                            .attr("class", "text-contour")
-                            .attr("transform", function(d) {
-                                return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
-                            }) // <-- 3
-                            .attr("dx", "-1") // <-- 4
-                            .attr("dy", ".5em") // <-- 5
-                            .text(function(d) { return displayP + "%"; });
-                        panel.append('text')
-                            .attr("class", "text-stroke")
-                            .attr("transform", function(d) {
-                                return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
-                            }) // <-- 3
-                            .attr("dx", "-1") // <-- 4
-                            .attr("dy", ".5em") // <-- 5
-                            .text(function(d) { return displayP + "%"; });
-                    }
-                    base = base + distance;
 
+                panel.html("");
+                keys.forEach(function(element) {
+                    var percentage = d.data.changes[element] / maxScope;
+                    var distance = 2.5 * percentage;
+                    var displayP = Number(percentage * 100).toFixed(1);
+                    var arc = {
+                        x0: base,
+                        x1: base + distance,
+                        y0: 1.1,
+                        y1: 1.3
+                    };
+                    panel.append('path').attr('d', state.outerArc(arc)).attr('id', element + d.data.name).attr('fill', state.outerColors(element)).style('display', 'block');
+
+                    if (percentage > 0.04) {
+                        panel.append('text').attr("class", "text-contour").attr("transform", function(d) {
+                                return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
+                            }) // <-- 3
+                            .attr("dx", "-1") // <-- 4
+                            .attr("dy", ".5em") // <-- 5
+                            .text(function(d) {
+                                return displayP + "%";
+                            });
+                        panel.append('text').attr("class", "text-stroke").attr("transform", function(d) {
+                                return "translate(" + state.outerArc.centroid(arc) + ")rotate(" + computeTextRotation(arc) + ")";
+                            }) // <-- 3
+                            .attr("dx", "-1") // <-- 4
+                            .attr("dy", ".5em") // <-- 5
+                            .text(function(d) {
+                                return displayP + "%";
+                            });
+                    }
+
+                    base = base + distance;
                 });
             }
         }
