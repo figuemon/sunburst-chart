@@ -112,6 +112,7 @@ export default Kapsule({
         state.chartId = Math.round(Math.random() * 1e12); // Unique ID for DOM elems
 
         state.radiusScale = scalePow();
+        state.originalRadiusScale = scalePow().domain([0, 1]);
         state.angleScale = scaleLinear()
             .domain([0, 10]) // For initial build-in animation
             .range([0, 2 * Math.PI])
@@ -132,8 +133,8 @@ export default Kapsule({
         state.outerArc = d3Arc()
             .startAngle(d => state.originalAngleScale(d.x0))
             .endAngle(d => state.originalAngleScale(d.x1))
-            .innerRadius(d => Math.max(0, state.radiusScale(d.y0)))
-            .outerRadius(d => Math.max(0, state.radiusScale(d.y1)));
+            .innerRadius(d => Math.max(0, state.originalRadiusScale(d.y0)))
+            .outerRadius(d => Math.max(0, state.originalRadiusScale(d.y1)));
 
         const el = d3Select(domNode)
             .append('div').attr('class', 'sunburst-viz');
@@ -168,6 +169,7 @@ export default Kapsule({
 
         const maxRadius = (Math.min(state.width - 100, state.height - 100) / 2);
         state.radiusScale.range([maxRadius * Math.max(0, Math.min(1, state.centerRadius)), maxRadius]);
+        state.originalRadiusScale.range([maxRadius * Math.max(0, Math.min(1, state.centerRadius)), maxRadius]);
 
         state.radiusScaleExponent > 0 && state.radiusScale.exponent(state.radiusScaleExponent);
 
@@ -240,15 +242,20 @@ export default Kapsule({
                 }
 
                 panel.html("");
+                var quadrant = 2.5;
+                if (d.data === state.focusOnNode || !d.parent) {
+                    base = 0;
+                    quadrant = 10;
+                }
                 keys.forEach(function(element) {
                     var percentage = d.data.changes[element] / maxScope;
-                    var distance = 2.5 * percentage;
+                    var distance = quadrant * percentage;
                     var displayP = Number(percentage * 100).toFixed(1);
                     var arc = {
                         x0: base,
                         x1: base + distance,
                         y0: 1.1,
-                        y1: 1.3
+                        y1: 1.25
                     };
                     panel.append('path').attr('d', state.outerArc(arc)).attr('id', element + d.data.name).attr('fill', state.outerColors(element)).style('display', 'block');
 

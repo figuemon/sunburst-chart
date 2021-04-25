@@ -4585,6 +4585,7 @@
       state.chartId = Math.round(Math.random() * 1e12); // Unique ID for DOM elems
 
       state.radiusScale = pow();
+      state.originalRadiusScale = pow().domain([0, 1]);
       state.angleScale = linear().domain([0, 10]) // For initial build-in animation
       .range([0, 2 * Math.PI]).clamp(true);
       state.originalAngleScale = linear().domain([0, 10]) // For initial build-in animation
@@ -4603,9 +4604,9 @@
       }).endAngle(function (d) {
         return state.originalAngleScale(d.x1);
       }).innerRadius(function (d) {
-        return Math.max(0, state.radiusScale(d.y0));
+        return Math.max(0, state.originalRadiusScale(d.y0));
       }).outerRadius(function (d) {
-        return Math.max(0, state.radiusScale(d.y1));
+        return Math.max(0, state.originalRadiusScale(d.y1));
       });
       var el = d3Select(domNode).append('div').attr('class', 'sunburst-viz');
       state.svg = el.append('svg');
@@ -4635,6 +4636,7 @@
 
       var maxRadius = Math.min(state.width - 100, state.height - 100) / 2;
       state.radiusScale.range([maxRadius * Math.max(0, Math.min(1, state.centerRadius)), maxRadius]);
+      state.originalRadiusScale.range([maxRadius * Math.max(0, Math.min(1, state.centerRadius)), maxRadius]);
       state.radiusScaleExponent > 0 && state.radiusScale.exponent(state.radiusScaleExponent);
       var adjustHeight = state.height + 100;
       var adjustWidth = state.height + 100;
@@ -4702,15 +4704,22 @@
           }
 
           panel.html("");
+          var quadrant = 2.5;
+
+          if (d.data === state.focusOnNode || !d.parent) {
+            base = 0;
+            quadrant = 10;
+          }
+
           keys.forEach(function (element) {
             var percentage = d.data.changes[element] / maxScope;
-            var distance = 2.5 * percentage;
+            var distance = quadrant * percentage;
             var displayP = Number(percentage * 100).toFixed(1);
             var arc = {
               x0: base,
               x1: base + distance,
               y0: 1.1,
-              y1: 1.3
+              y1: 1.25
             };
             panel.append('path').attr('d', state.outerArc(arc)).attr('id', element + d.data.name).attr('fill', state.outerColors(element)).style('display', 'block');
 
